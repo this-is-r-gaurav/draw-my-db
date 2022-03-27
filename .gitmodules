@@ -1,0 +1,9 @@
+[submodule "grammar"]
+	path = src/grammar
+	url = https://github.com/this-is-r-gaurav/db-grammar.git
+[submodule "src/grammar"]
+	path = src/grammar
+	url = https://github.com/this-is-r-gaurav/db-grammar.git
+[submodule "src/grammar/db-grammar"]
+	path = src/grammar/db-grammar
+	url = https://github.com/this-is-r-gaurav/db-grammar.git
