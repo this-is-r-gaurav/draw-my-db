@@ -11,6 +11,7 @@ import { createSchemaDBVisitor } from '../grammar/db-grammar/src/visitor'
 import { DBDefinitionLexer } from '../grammar/db-grammar/src/lexer'
 import { debounce } from './common/utils'
 import { uniqBy } from 'lodash'
+import { IDbElement, IRefElement, ITableElement } from '../grammar/db-grammar/src/types/index.d'
 interface HomeStateInterface{
   schema: string
 }
@@ -35,37 +36,40 @@ export class Home extends React.Component<object, HomeStateInterface> {
       }
     }, 500)
 
-    async getTableLayout(data){
-      const tables = data.filter((item) => {
-        return item.type === 'table'
-      })
-      console.log(tables)
-    
-      // const uniqueTables = uniqBy(tables, 'name')
-    
-      // const availableColumns = uniqueTables
-      //   .map((table) => {
-      //     return table.columns.map((column) => {
-      //       return `${table.name}.${column.name}`
-      //     })
-      //   })
-      //   .flat()
-    
-      // const refs = data.filter((item) => {
-      //   return item.type === 'ref'
-      // })
-    
-      // const filteredRefs = refs.filter(({foreign, primary}) => {
-      //   const foreignRef = `${foreign.table}.${foreign.column}`
-      //   const primaryRef = `${primary.table}.${primary.column}`
-    
-      //   return (
-      //     availableColumns.includes(foreignRef) &&
-      //     availableColumns.includes(primaryRef)
-      //   )
-      // })
-    
-      // return arrangeItems(uniqueTables, filteredRefs)
+    async getTableLayout(data: IDbElement[]){
+      if (data){
+        console.log(data)
+        const tables:ITableElement[] = data.filter((item) => {
+          return item.type === 'table'
+        })
+        const uniqueTables:ITableElement[] = uniqBy(tables, 'name')
+      
+        const availableColumns = uniqueTables
+          .map((table) => {
+            return table.columns.map((column) => {
+              return `${table.name}.${column.name}`
+            })
+          })
+          .flat()
+
+          console.log(availableColumns)
+      
+        const refs: IRefElement[] = data.filter((item:IRefElement) => {
+          return item.type === 'ref'
+        })
+      
+        const filteredRefs = refs.filter(({foreign, primary}) => {
+          const foreignRef = `${foreign.table}.${foreign.column}`
+          const primaryRef = `${primary.table}.${primary.column}`
+      
+          return (
+            availableColumns.includes(foreignRef) &&
+            availableColumns.includes(primaryRef)
+          )
+        })
+      
+        // return arrangeItems(uniqueTables, filteredRefs)
+      }
     }
 
     parseInput(text: string){
@@ -76,6 +80,7 @@ export class Home extends React.Component<object, HomeStateInterface> {
       const parsetOutput = this.customVisitor.visit(result)
 
       if (this.schemeParser.errors.length > 0) {
+        console.error(this.schemeParser.errors)
         // throw new Error('sad sad panda, Parsing errors detected')
       }
 
